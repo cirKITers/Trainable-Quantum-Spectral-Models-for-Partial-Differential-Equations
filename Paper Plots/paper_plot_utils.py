@@ -245,13 +245,10 @@ def _save_figure(
     fig: plt.Figure,
     fig_dir: str | Path,
     pdf_basename: str,
-    png_basename: str | None = None,
 ) -> None:
     output_dir = Path(fig_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    png_basename = pdf_basename if png_basename is None else png_basename
     fig.savefig(output_dir / f"{pdf_basename}.pdf", bbox_inches="tight")
-    fig.savefig(output_dir / f"{png_basename}.png", bbox_inches="tight")
 
 
 def plot_absolute_spectral_error(
