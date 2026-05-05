@@ -4,13 +4,14 @@ import sys
 from pathlib import Path
 
 
-POISSON_DIR = Path(__file__).resolve().parent
-PAPER_PLOTS_DIR = POISSON_DIR.parent
+SCRIPT_DIR = Path(__file__).resolve().parent
+PAPER_PLOTS_DIR = SCRIPT_DIR.parent
 
 if str(PAPER_PLOTS_DIR) not in sys.path:
     sys.path.insert(0, str(PAPER_PLOTS_DIR))
 
-from paper_plot_utils import (
+from paper_plot_utils import (  # noqa: E402
+    LoadedResults,
     load_results,
     plot_absolute_spectral_error,
     plot_expressibility,
@@ -21,19 +22,24 @@ from paper_plot_utils import (
 )
 
 
-RESULTS_PATH = POISSON_DIR / "../../Data/Poisson/poisson_N16_epochs180_seeds3_20260504_163301.pkl"
-FIG_DIR = POISSON_DIR / "paper_figures"
+RESULTS_PATH = "Data/Poisson/poisson_N16_epochs180_seeds3_20260504_163301.pkl"
+FIG_DIR = SCRIPT_DIR / "paper_figures"
 
 
-def main(*, save_figures: bool = True, show: bool = True):
+def main(
+    *,
+    fig_dir: str | Path = FIG_DIR,
+    save_figures: bool = True,
+    show: bool = True,
+) -> LoadedResults:
     results = load_results(RESULTS_PATH)
 
-    plot_absolute_spectral_error(results, fig_dir=FIG_DIR, save_figures=save_figures, show=show)
-    plot_training_loss(results, fig_dir=FIG_DIR, save_figures=save_figures, show=show)
-    plot_gradient_power(results, fig_dir=FIG_DIR, save_figures=save_figures, show=show)
-    plot_gradient_variance(results, fig_dir=FIG_DIR, save_figures=save_figures, show=show)
-    plot_expressibility(results, fig_dir=FIG_DIR, save_figures=save_figures, show=show)
-    plot_training_fidelity(results, fig_dir=FIG_DIR, save_figures=save_figures, show=show)
+    plot_absolute_spectral_error(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_training_loss(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_gradient_power(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_gradient_variance(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_expressibility(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_training_fidelity(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
 
     return results
 

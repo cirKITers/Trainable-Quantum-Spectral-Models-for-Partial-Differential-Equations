@@ -1,2 +1,141 @@
-#TODO: add some basic argparse to generate the data ("helmholtz.py", "poisson.py" and "var_poisson.py")
-#TODO: add some basic argparse to generate all figures ("plots.py" scripts)
+from __future__ import annotations
+
+import argparse
+import sys
+from collections.abc import Sequence
+from dataclasses import dataclass
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+
+
+REPO_ROOT = Path(__file__).resolve().parent
+PAPER_PLOTS_DIR = REPO_ROOT / "Paper Plots"
+
+if str(PAPER_PLOTS_DIR) not in sys.path:
+    sys.path.insert(0, str(PAPER_PLOTS_DIR))
+
+from paper_plot_utils import (  # noqa: E402
+    LoadedResults,
+    load_results,
+    plot_absolute_spectral_error,
+    plot_expressibility,
+    plot_gradient_power,
+    plot_gradient_variance,
+    plot_training_fidelity,
+    plot_training_loss,
+)
+
+
+@dataclass(frozen=True)
+class PlotConfig:
+    name: str
+    results_path: Path
+    figures_dir: Path
+
+
+PLOT_CONFIGS = {
+    "helmholtz": PlotConfig(
+        name="Helmholtz",
+        results_path=REPO_ROOT / "Data/Helmholtz/helmholtz_N16_epochs180_seeds3_20260504_163221.pkl",
+        figures_dir=PAPER_PLOTS_DIR / "Helmholtz/paper_figures",
+    ),
+    "poisson": PlotConfig(
+        name="Poisson",
+        results_path=REPO_ROOT / "Data/Poisson/poisson_N16_epochs180_seeds3_20260504_163301.pkl",
+        figures_dir=PAPER_PLOTS_DIR / "Poisson/paper_figures",
+    ),
+    "varpoisson": PlotConfig(
+        name="VarPoisson",
+        results_path=REPO_ROOT / "Data/VarPoisson/varpoisson_N16_epochs180_seeds3_20260504_163028.pkl",
+        figures_dir=PAPER_PLOTS_DIR / "VarPoisson/paper_figures",
+    ),
+}
+
+PLOT_FUNCTIONS = (
+    plot_absolute_spectral_error,
+    plot_training_loss,
+    plot_gradient_power,
+    plot_gradient_variance,
+    plot_expressibility,
+    plot_training_fidelity,
+)
+
+
+def selected_plot_configs(equations: Sequence[str]) -> list[PlotConfig]:
+    if "all" in equations:
+        return list(PLOT_CONFIGS.values())
+
+    return [PLOT_CONFIGS[equation] for equation in equations]
+
+
+def plot_results(
+    config: PlotConfig,
+    *,
+    save_figures: bool = True,
+) -> LoadedResults:
+    print(f"Generating {config.name} figures in {config.figures_dir}")
+    results = load_results(config.results_path)
+
+    for plot_function in PLOT_FUNCTIONS:
+        fig, _ = plot_function(
+            results,
+            fig_dir=config.figures_dir,
+            save_figures=save_figures,
+        )
+        plt.close(fig)
+
+    return results
+
+
+def run_plots(
+    equations: Sequence[str],
+    *,
+    save_figures: bool = True,
+) -> list[LoadedResults]:
+    return [
+        plot_results(config, save_figures=save_figures)
+        for config in selected_plot_configs(equations)
+    ]
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Run project workflows.",
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    plots_parser = subparsers.add_parser(
+        "plots",
+        aliases=["plot"],
+        help="Regenerate paper figures from existing result pickle files.",
+    )
+    plots_parser.add_argument(
+        "--equations",
+        nargs="+",
+        choices=["all", *PLOT_CONFIGS.keys()],
+        default=["all"],
+        help="Equation result sets to plot. Defaults to all.",
+    )
+    plots_parser.add_argument(
+        "--no-save",
+        action="store_true",
+        help="Run plotting without writing PDF/PNG files.",
+    )
+
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> None:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    if args.command in {"plot"}:
+        run_plots(
+            args.equations,
+            save_figures=not args.no_save,
+        )
+
+
+if __name__ == "__main__":
+    main()

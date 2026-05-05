@@ -4,11 +4,14 @@ import sys
 from pathlib import Path
 
 
-PAPER_PLOTS_DIR = Path(__file__).resolve().parents[1]
+SCRIPT_DIR = Path(__file__).resolve().parent
+PAPER_PLOTS_DIR = SCRIPT_DIR.parent
+
 if str(PAPER_PLOTS_DIR) not in sys.path:
     sys.path.insert(0, str(PAPER_PLOTS_DIR))
 
 from paper_plot_utils import (  # noqa: E402
+    LoadedResults,
     load_results,
     plot_absolute_spectral_error,
     plot_expressibility,
@@ -16,41 +19,29 @@ from paper_plot_utils import (  # noqa: E402
     plot_gradient_variance,
     plot_training_fidelity,
     plot_training_loss,
-    resolve_results_path,
 )
 
 
-results_path = "../../Data/VarPoisson/varpoisson_N16_epochs180_seeds3_20260504_163028.pkl"
-# Alternate repo-root-friendly path used in the original script:
-# results_path = "Data/VarPoisson/varpoisson_N16_epochs180_seeds3_20260504_163028.pkl"
-alternate_results_path = "Data/VarPoisson/varpoisson_N16_epochs180_seeds3_20260504_163028.pkl"
-fig_dir = "paper_figures"
+RESULTS_PATH = "Data/VarPoisson/varpoisson_N16_epochs180_seeds3_20260504_163028.pkl"
+FIG_DIR = SCRIPT_DIR / "paper_figures"
 
 
-def _resolve_varpoisson_results_path() -> Path:
-    script_dir = Path(__file__).resolve().parent
+def main(
+    *,
+    fig_dir: str | Path = FIG_DIR,
+    save_figures: bool = True,
+    show: bool = True,
+) -> LoadedResults:
+    results = load_results(RESULTS_PATH)
 
-    for candidate in (results_path, alternate_results_path):
-        resolved = resolve_results_path(candidate)
-        if resolved.exists():
-            return resolved
+    plot_absolute_spectral_error(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_training_loss(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_gradient_power(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_gradient_variance(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_expressibility(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_training_fidelity(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
 
-        file_relative = (script_dir / candidate).resolve()
-        if file_relative.exists():
-            return file_relative
-
-    return resolve_results_path(results_path)
-
-
-def main() -> None:
-    results = load_results(_resolve_varpoisson_results_path())
-
-    plot_absolute_spectral_error(results, fig_dir=fig_dir)
-    plot_training_loss(results, fig_dir=fig_dir)
-    plot_gradient_power(results, fig_dir=fig_dir)
-    plot_gradient_variance(results, fig_dir=fig_dir)
-    plot_expressibility(results, fig_dir=fig_dir)
-    plot_training_fidelity(results, fig_dir=fig_dir)
+    return results
 
 
 if __name__ == "__main__":
