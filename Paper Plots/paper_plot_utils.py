@@ -473,6 +473,114 @@ def plot_combined_training_loss(
     return fig, axes
 
 
+def plot_combined_training_fidelity(
+    titled_results: Sequence[tuple[str, LoadedResults]],
+    *,
+    fig_dir: str | Path = "paper_figures",
+    pdf_basename: str = "fig_training_fidelity_combined_paper",
+) -> tuple[plt.Figure, np.ndarray]:
+    if not titled_results:
+        raise ValueError("At least one result set is required.")
+
+    apply_paper_style("line", legend_fontsize=12)
+    fig, axes = plt.subplots(
+        1,
+        len(titled_results),
+        figsize=(9, 5),
+        sharex=True,
+        sharey=True,
+        squeeze=False,
+    )
+    axes = axes.ravel()
+    legend_entries: dict[str, tuple[Any, str]] = {}
+
+    for panel_index, (ax, (title, results)) in enumerate(zip(axes, titled_results)):
+        styles = build_style_maps(
+            results.all_model_keys,
+            results.richer_epsilon_list,
+            label_variant="long",
+        )
+        epochs = np.arange(results.n_epochs)
+
+        for model_key in styles.plot_model_keys:
+            metric_values = _extract_metric_stack(
+                results.all_results, model_key, "train_fid"
+            )
+            mean = np.mean(metric_values, axis=0)
+            std = np.std(metric_values, axis=0)
+
+            is_hhl_model = model_key == "hhl_like_free"
+            line, = ax.plot(
+                epochs,
+                mean,
+                label=styles.label_map.get(model_key, model_key),
+                color=styles.color_map.get(model_key),
+                linestyle=styles.style_map[model_key]["linestyle"],
+                marker=styles.style_map[model_key]["marker"],
+                linewidth=3.0 if is_hhl_model else 1.35,
+                markersize=4.4 if is_hhl_model else 3.0,
+                markevery=max(1, results.n_epochs // 10),
+                alpha=1.0 if is_hhl_model else 0.62,
+                zorder=5 if is_hhl_model else 2,
+            )
+            ax.fill_between(
+                epochs,
+                np.clip(mean - std, 0.0, 1.0),
+                np.clip(mean + std, 0.0, 1.0),
+                color=styles.color_map.get(model_key),
+                alpha=0.20 if is_hhl_model else 0.055,
+                linewidth=0,
+                zorder=4 if is_hhl_model else 1,
+            )
+
+            if model_key.startswith("richer_spectral_eps_"):
+                legend_entries.setdefault(
+                    "richer_spectral",
+                    (line, "Richer spectral variants"),
+                )
+            else:
+                legend_entries.setdefault(
+                    model_key,
+                    (line, styles.label_map.get(model_key, model_key)),
+                )
+
+        ax.set_title(title)
+        ax.set_xlim(0, results.n_epochs - 1)
+        ax.set_ylim(0.0, 1.02)
+        ax.set_xlabel("Epoch")
+        ax.tick_params(labelleft=panel_index == 0)
+
+    axes[0].set_ylabel(r"$F_{\mathrm{train}}$", labelpad=8)
+    legend_order = [
+        "diag_phase_free",
+        "unitary",
+        "richer_spectral",
+        "hhl_like_free",
+        "hwe",
+    ]
+    legend_handles = [
+        legend_entries[key][0] for key in legend_order if key in legend_entries
+    ]
+    legend_labels = [
+        legend_entries[key][1] for key in legend_order if key in legend_entries
+    ]
+    fig.legend(
+        legend_handles,
+        legend_labels,
+        frameon=False,
+        ncol=3,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.02),
+        columnspacing=1.4,
+        handlelength=2.0,
+        handletextpad=0.6,
+    )
+    fig.tight_layout(rect=[0, 0.16, 1, 1])
+    _save_figure(fig, fig_dir, pdf_basename)
+
+    return fig, axes
+
+
 def plot_gradient_power(
     results: LoadedResults,
     *,
@@ -755,6 +863,7 @@ __all__ = [
     "build_style_maps",
     "load_results",
     "plot_absolute_spectral_error",
+    "plot_combined_training_fidelity",
     "plot_combined_training_loss",
     "plot_expressibility",
     "plot_gradient_power",

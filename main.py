@@ -19,6 +19,7 @@ from paper_plot_utils import (  # noqa: E402
     LoadedResults,
     load_results,
     plot_absolute_spectral_error,
+    plot_combined_training_fidelity,
     plot_combined_training_loss,
     plot_expressibility,
     plot_gradient_power,
@@ -138,6 +139,25 @@ def run_combined_training_loss_plot(equations: Sequence[str]) -> LoadedResults |
     return titled_results[-1][1]
 
 
+def run_combined_training_fidelity_plot(
+    equations: Sequence[str],
+) -> LoadedResults | None:
+    configs = selected_combined_training_loss_configs(equations)
+    if not configs:
+        return None
+
+    titled_results = [
+        (title, load_results(config.results_path))
+        for title, config in configs
+    ]
+    fig, _ = plot_combined_training_fidelity(
+        titled_results,
+        fig_dir=COMBINED_FIGURES_DIR,
+    )
+    plt.close(fig)
+    return titled_results[-1][1]
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run project workflows.",
@@ -164,6 +184,14 @@ def build_parser() -> argparse.ArgumentParser:
             "for the selected equations."
         ),
     )
+    plots_parser.add_argument(
+        "--combined-training-fidelity",
+        action="store_true",
+        help=(
+            "Also generate one shared multi-panel training-fidelity figure "
+            "for the selected equations."
+        ),
+    )
 
     return parser
 
@@ -178,6 +206,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         )
         if args.combined_training_loss:
             run_combined_training_loss_plot(args.equations)
+        if args.combined_training_fidelity:
+            run_combined_training_fidelity_plot(args.equations)
 
 
 if __name__ == "__main__":
