@@ -83,13 +83,13 @@ def load_results(results_path: str | Path) -> LoadedResults:
     return loaded
 
 
-def apply_paper_style(variant: str = "line", *, legend_fontsize: int = 12) -> None:
+def apply_paper_style(variant: str = "line", *) -> None:
     if variant == "line":
         params = {
             "font.size": 11,
             "axes.labelsize": 13,
             "axes.titlesize": 13,
-            "legend.fontsize": legend_fontsize,
+            "legend.fontsize": 12,
             "xtick.labelsize": 11,
             "ytick.labelsize": 11,
             "figure.dpi": 140,
@@ -259,7 +259,7 @@ def plot_absolute_spectral_error(
     *,
     fig_dir: str | Path = "paper_figures",
 ) -> tuple[plt.Figure, plt.Axes]:
-    apply_paper_style("line", legend_fontsize=10)
+    apply_paper_style("line")
     styles = build_style_maps(
         results.all_model_keys,
         results.richer_epsilon_list,
@@ -315,7 +315,7 @@ def plot_training_loss(
     *,
     fig_dir: str | Path = "paper_figures",
 ) -> tuple[plt.Figure, plt.Axes]:
-    apply_paper_style("line", legend_fontsize=10)
+    apply_paper_style("line")
     styles = build_style_maps(
         results.all_model_keys, results.richer_epsilon_list, label_variant="long"
     )
@@ -370,7 +370,7 @@ def plot_combined_training_loss(
     if not titled_results:
         raise ValueError("At least one result set is required.")
 
-    apply_paper_style("line", legend_fontsize=12)
+    apply_paper_style("line")
     fig, axes = plt.subplots(
         1,
         len(titled_results),
@@ -482,7 +482,7 @@ def plot_combined_training_fidelity(
     if not titled_results:
         raise ValueError("At least one result set is required.")
 
-    apply_paper_style("line", legend_fontsize=12)
+    apply_paper_style("line")
     fig, axes = plt.subplots(
         1,
         len(titled_results),
@@ -586,7 +586,7 @@ def plot_gradient_power(
     *,
     fig_dir: str | Path = "paper_figures",
 ) -> tuple[plt.Figure, plt.Axes]:
-    apply_paper_style("line", legend_fontsize=12)
+    apply_paper_style("line")
     styles = build_style_maps(
         results.all_model_keys, results.richer_epsilon_list, label_variant="long"
     )
@@ -803,7 +803,7 @@ def plot_training_fidelity(
     *,
     fig_dir: str | Path = "paper_figures",
 ) -> tuple[plt.Figure, plt.Axes]:
-    apply_paper_style("line", legend_fontsize=12)
+    apply_paper_style("line")
     styles = build_style_maps(
         results.all_model_keys, results.richer_epsilon_list, label_variant="long"
     )
