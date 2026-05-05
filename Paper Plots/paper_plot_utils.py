@@ -83,7 +83,7 @@ def load_results(results_path: str | Path) -> LoadedResults:
     return loaded
 
 
-def apply_paper_style(variant: str = "line", *, legend_fontsize: int = 10) -> None:
+def apply_paper_style(variant: str = "line", *, legend_fontsize: int = 12) -> None:
     if variant == "line":
         params = {
             "font.size": 11,

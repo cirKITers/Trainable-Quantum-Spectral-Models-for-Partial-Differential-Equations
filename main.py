@@ -59,9 +59,9 @@ PLOT_CONFIGS = {
 COMBINED_FIGURES_DIR = PAPER_PLOTS_DIR / "paper_figures"
 COMBINED_TRAINING_LOSS_ORDER = ("poisson", "helmholtz", "varpoisson")
 COMBINED_TRAINING_LOSS_TITLES = {
-    "poisson": "(a) Poisson",
-    "helmholtz": "(b) Helmholtz",
-    "varpoisson": "(c) Variable-coefficient Poisson",
+    "poisson": "Poisson",
+    "helmholtz": "Helmholtz",
+    "varpoisson": "Variable Poisson",
 }
 
 PLOT_FUNCTIONS = (
