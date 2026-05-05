@@ -1,32 +1,63 @@
-import pickle
-import os
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+
+POISSON_DIR = Path(__file__).resolve().parent
+PAPER_PLOTS_DIR = POISSON_DIR.parent
+
+if str(PAPER_PLOTS_DIR) not in sys.path:
+    sys.path.insert(0, str(PAPER_PLOTS_DIR))
+
+from paper_plot_utils import load_results as shared_load_results
+
 
 results_path = "Data/Poisson/poisson_N16_epochs180_seeds3_20260504_163301.pkl"
 
-if not os.path.exists(results_path):
-    raise FileNotFoundError(f"Could not find results file: {results_path}")
+loaded_results = shared_load_results(results_path)
 
-with open(results_path, "rb") as f:
-    payload = pickle.load(f)
+all_results = loaded_results.all_results
+aggregated = loaded_results.aggregated
+all_model_keys = loaded_results.all_model_keys
 
-# Restore variables expected by the plotting scripts
-all_results = payload["all_results"]
-aggregated = payload["aggregated"]
-all_model_keys = payload["all_model_keys"]
+N = loaded_results.N
+n_epochs = loaded_results.n_epochs
+richer_epsilon_list = loaded_results.richer_epsilon_list
 
-N = payload["N"]
-n_epochs = payload["n_epochs"]
-richer_epsilon_list = payload["richer_epsilon_list"]
+equation_type = loaded_results.equation_type
+model_kind = loaded_results.model_kind
+noise_std = loaded_results.noise_std
+seed_list = loaded_results.seed_list
+resolved_path = loaded_results.resolved_path
 
-# Optional metadata restore
-equation_type = payload.get("equation_type")
-model_kind = payload.get("model_kind")
-noise_std = payload.get("noise_std")
-seed_list = payload.get("seed_list")
+payload = {
+    "all_results": all_results,
+    "aggregated": aggregated,
+    "all_model_keys": all_model_keys,
+    "N": N,
+    "n_epochs": n_epochs,
+    "richer_epsilon_list": richer_epsilon_list,
+    "equation_type": equation_type,
+    "model_kind": model_kind,
+    "noise_std": noise_std,
+    "seed_list": seed_list,
+}
 
-print("Loaded results from:", results_path)
-print("Equation:", equation_type)
-print("Models:", all_model_keys)
-print("N:", N)
-print("n_epochs:", n_epochs)
-print("richer_epsilon_list:", richer_epsilon_list)
+
+__all__ = [
+    "results_path",
+    "resolved_path",
+    "loaded_results",
+    "payload",
+    "all_results",
+    "aggregated",
+    "all_model_keys",
+    "N",
+    "n_epochs",
+    "richer_epsilon_list",
+    "equation_type",
+    "model_kind",
+    "noise_std",
+    "seed_list",
+]
