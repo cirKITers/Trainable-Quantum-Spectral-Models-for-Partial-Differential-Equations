@@ -1,0 +1,1 @@
+# Trainable Quantum Spectral Models for Partial Differential Equations
