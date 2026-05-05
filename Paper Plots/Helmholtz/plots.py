@@ -30,16 +30,16 @@ def main(
     *,
     fig_dir: str | Path = FIG_DIR,
     save_figures: bool = True,
-    show: bool = True,
+    
 ) -> LoadedResults:
     results = load_results(RESULTS_PATH)
 
-    plot_absolute_spectral_error(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
-    plot_training_loss(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
-    plot_gradient_power(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
-    plot_gradient_variance(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
-    plot_expressibility(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
-    plot_training_fidelity(results, fig_dir=fig_dir, save_figures=save_figures, show=show)
+    plot_absolute_spectral_error(results, fig_dir=fig_dir, save_figures=save_figures)
+    plot_training_loss(results, fig_dir=fig_dir, save_figures=save_figures)
+    plot_gradient_power(results, fig_dir=fig_dir, save_figures=save_figures)
+    plot_gradient_variance(results, fig_dir=fig_dir, save_figures=save_figures)
+    plot_expressibility(results, fig_dir=fig_dir, save_figures=save_figures)
+    plot_training_fidelity(results, fig_dir=fig_dir, save_figures=save_figures)
 
     return results
 
