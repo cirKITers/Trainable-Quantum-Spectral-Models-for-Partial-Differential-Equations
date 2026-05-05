@@ -473,11 +473,11 @@ def plot_combined_training_loss(
     return fig, axes
 
 
-def plot_combined_training_modewise(
+def plot_combined_absolute_spectral_error(
     titled_results: Sequence[tuple[str, LoadedResults]],
     *,
     fig_dir: str | Path = "paper_figures",
-    pdf_basename: str = "fig_training_loss_combined_paper",
+    pdf_basename: str = "fig_absolute_spectral_error_combined_paper",
 ) -> tuple[plt.Figure, np.ndarray]:
     if not titled_results:
         raise ValueError("At least one result set is required.")
@@ -499,20 +499,20 @@ def plot_combined_training_modewise(
         styles = build_style_maps(
             results.all_model_keys,
             results.richer_epsilon_list,
-            label_variant="long",
+            label_variant="absolute_error",
         )
-        epochs = np.arange(results.n_epochs)
+        k_plot = np.arange(1, results.N + 1)
 
         for model_key in styles.plot_model_keys:
             metric_values = _extract_metric_stack(
-                results.all_results, model_key, "train_loss"
+                results.all_results, model_key, "abs_err"
             )
             med, q25, q75 = _log_space_median_q25_q75(metric_values, axis=0)
             all_log_values.extend([q25, q75])
 
             is_hhl_model = model_key == "hhl_like_free"
             line, = ax.plot(
-                epochs,
+                k_plot,
                 med,
                 label=styles.label_map.get(model_key, model_key),
                 color=styles.color_map.get(model_key),
@@ -520,12 +520,11 @@ def plot_combined_training_modewise(
                 marker=styles.style_map[model_key]["marker"],
                 linewidth=3.0 if is_hhl_model else 1.35,
                 markersize=4.4 if is_hhl_model else 3.0,
-                markevery=max(1, results.n_epochs // 10),
                 alpha=1.0 if is_hhl_model else 0.62,
                 zorder=5 if is_hhl_model else 2,
             )
             ax.fill_between(
-                epochs,
+                k_plot,
                 q25,
                 q75,
                 color=styles.color_map.get(model_key),
@@ -546,15 +545,16 @@ def plot_combined_training_modewise(
                 )
 
         ax.set_title(title)
-        ax.set_xlim(0, results.n_epochs - 1)
-        ax.set_xlabel("Epoch")
+        ax.set_xlim(0.5, results.N + 0.5)
+        ax.set_xticks(np.unique(np.r_[np.arange(1, results.N + 1, 3), results.N]))
+        ax.set_xlabel(r"Spectral mode $k$")
         ax.tick_params(labelleft=panel_index == 0)
 
     global_log_values = np.asarray(all_log_values)
     for ax in axes:
         _apply_dynamic_log_ticks(ax, global_log_values)
 
-    axes[0].set_ylabel(r"$\mathcal{L}_{\mathrm{train}}$", labelpad=8)
+    axes[0].set_ylabel(r"$E_k$", labelpad=8)
     legend_order = [
         "diag_phase_free",
         "unitary",
@@ -584,6 +584,8 @@ def plot_combined_training_modewise(
 
     return fig, axes
 
+
+plot_combined_training_modewise = plot_combined_absolute_spectral_error
 
 
 def plot_combined_training_fidelity(
@@ -976,8 +978,10 @@ __all__ = [
     "build_style_maps",
     "load_results",
     "plot_absolute_spectral_error",
+    "plot_combined_absolute_spectral_error",
     "plot_combined_training_fidelity",
     "plot_combined_training_loss",
+    "plot_combined_training_modewise",
     "plot_expressibility",
     "plot_gradient_power",
     "plot_gradient_variance",

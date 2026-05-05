@@ -19,6 +19,7 @@ from paper_plot_utils import (  # noqa: E402
     LoadedResults,
     load_results,
     plot_absolute_spectral_error,
+    plot_combined_absolute_spectral_error,
     plot_combined_training_fidelity,
     plot_combined_training_loss,
     plot_expressibility,
@@ -148,7 +149,7 @@ def run_combined_training_modewise_plot(equations: Sequence[str]) -> LoadedResul
         (title, load_results(config.results_path))
         for title, config in configs
     ]
-    fig, _ = plot_combined_training_loss(
+    fig, _ = plot_combined_absolute_spectral_error(
         titled_results,
         fig_dir=COMBINED_FIGURES_DIR,
     )
@@ -211,10 +212,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     plots_parser.add_argument(
         "--combined-training-modewise",
+        "--combined-absolute-spectral-error",
         action="store_true",
+        dest="combined_training_modewise",
         help=(
-            "Also generate one shared multi-panel training-modewise figure "
-            "for the selected equations."
+            "Also generate one shared multi-panel absolute spectral error "
+            "figure for the selected equations."
         ),
     )
 

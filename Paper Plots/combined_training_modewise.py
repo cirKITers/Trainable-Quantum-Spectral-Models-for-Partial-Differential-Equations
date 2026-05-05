@@ -12,7 +12,7 @@ REPO_ROOT = SCRIPT_DIR.parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from paper_plot_utils import load_results, plot_combined_training_loss  # noqa: E402
+from paper_plot_utils import load_results, plot_combined_training_modewise  # noqa: E402
 
 
 RESULT_CONFIGS = (
@@ -42,7 +42,7 @@ def main(
         (title, load_results(results_path))
         for title, results_path in RESULT_CONFIGS
     ]
-    fig, _ = plot_combined_training_loss(titled_results, fig_dir=fig_dir)
+    fig, _ = plot_combined_training_modewise(titled_results, fig_dir=fig_dir)
     plt.close(fig)
 
 
