@@ -252,22 +252,11 @@ def _save_figure(
     fig.savefig(output_dir / f"{png_basename}.png", bbox_inches="tight")
 
 
-def _show_if_requested(show: bool) -> None:
-    if not show:
-        return
-
-    if plt.get_backend().lower().endswith("agg"):
-        return
-
-    plt.show()
-
-
 def plot_absolute_spectral_error(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
     save_figures: bool = True,
-    show: bool = True,
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=10)
     styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="absolute_error")
@@ -314,7 +303,7 @@ def plot_absolute_spectral_error(
             "fig_absolute_spectral_error_paper",
         )
 
-    _show_if_requested(show)
+    
     return fig, ax
 
 
@@ -323,7 +312,7 @@ def plot_training_loss(
     *,
     fig_dir: str | Path = "paper_figures",
     save_figures: bool = True,
-    show: bool = True,
+    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=10)
     styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="long")
@@ -365,7 +354,7 @@ def plot_training_loss(
     if save_figures:
         _save_figure(fig, fig_dir, "fig_training_loss_paper_3")
 
-    _show_if_requested(show)
+    
     return fig, ax
 
 
@@ -374,7 +363,7 @@ def plot_gradient_power(
     *,
     fig_dir: str | Path = "paper_figures",
     save_figures: bool = True,
-    show: bool = True,
+    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=9)
     styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="long")
@@ -423,7 +412,7 @@ def plot_gradient_power(
     if save_figures:
         _save_figure(fig, fig_dir, "fig_gradient_power_paper")
 
-    _show_if_requested(show)
+    
     return fig, ax
 
 
@@ -432,7 +421,7 @@ def plot_gradient_variance(
     *,
     fig_dir: str | Path = "paper_figures",
     save_figures: bool = True,
-    show: bool = True,
+    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("bar")
     styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="short")
@@ -508,7 +497,7 @@ def plot_gradient_variance(
     if save_figures:
         _save_figure(fig, fig_dir, "fig_gradient_variance_final_aligned")
 
-    _show_if_requested(show)
+    
     return fig, ax
 
 
@@ -517,7 +506,7 @@ def plot_expressibility(
     *,
     fig_dir: str | Path = "paper_figures",
     save_figures: bool = True,
-    show: bool = True,
+    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("bar")
     styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="short")
@@ -584,7 +573,7 @@ def plot_expressibility(
     if save_figures:
         _save_figure(fig, fig_dir, "fig_expressibility_centered_labels")
 
-    _show_if_requested(show)
+    
     return fig, ax
 
 
@@ -593,7 +582,7 @@ def plot_training_fidelity(
     *,
     fig_dir: str | Path = "paper_figures",
     save_figures: bool = True,
-    show: bool = True,
+    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=10)
     styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="long")
@@ -639,7 +628,7 @@ def plot_training_fidelity(
     if save_figures:
         _save_figure(fig, fig_dir, "fig_training_fidelity_paper")
 
-    _show_if_requested(show)
+    
     return fig, ax
 
 
