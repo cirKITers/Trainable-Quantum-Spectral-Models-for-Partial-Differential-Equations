@@ -37,17 +37,20 @@ class PlotConfig:
 PLOT_CONFIGS = {
     "helmholtz": PlotConfig(
         name="Helmholtz",
-        results_path=REPO_ROOT / "Data/Helmholtz/helmholtz_N16_epochs180_seeds3_20260504_163221.pkl",
+        results_path=REPO_ROOT
+        / "Data/Helmholtz/helmholtz_N16_epochs180_seeds3_20260504_163221.pkl",
         figures_dir=PAPER_PLOTS_DIR / "Helmholtz/paper_figures",
     ),
     "poisson": PlotConfig(
         name="Poisson",
-        results_path=REPO_ROOT / "Data/Poisson/poisson_N16_epochs180_seeds3_20260504_163301.pkl",
+        results_path=REPO_ROOT
+        / "Data/Poisson/poisson_N16_epochs180_seeds3_20260504_163301.pkl",
         figures_dir=PAPER_PLOTS_DIR / "Poisson/paper_figures",
     ),
     "varpoisson": PlotConfig(
         name="VarPoisson",
-        results_path=REPO_ROOT / "Data/VarPoisson/varpoisson_N16_epochs180_seeds3_20260504_163028.pkl",
+        results_path=REPO_ROOT
+        / "Data/VarPoisson/varpoisson_N16_epochs180_seeds3_20260504_163028.pkl",
         figures_dir=PAPER_PLOTS_DIR / "VarPoisson/paper_figures",
     ),
 }
@@ -71,7 +74,6 @@ def selected_plot_configs(equations: Sequence[str]) -> list[PlotConfig]:
 
 def plot_results(
     config: PlotConfig,
-    *,
 ) -> LoadedResults:
     print(f"Generating {config.name} figures in {config.figures_dir}")
     results = load_results(config.results_path)
@@ -80,7 +82,6 @@ def plot_results(
         fig, _ = plot_function(
             results,
             fig_dir=config.figures_dir,
-            
         )
         plt.close(fig)
 
@@ -90,10 +91,7 @@ def plot_results(
 def run_plots(
     equations: Sequence[str],
 ) -> list[LoadedResults]:
-    return [
-        plot_results(config)
-        for config in selected_plot_configs(equations)
-    ]
+    return [plot_results(config) for config in selected_plot_configs(equations)]
 
 
 def build_parser() -> argparse.ArgumentParser:

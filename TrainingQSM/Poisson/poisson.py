@@ -7,14 +7,14 @@ import matplotlib.pyplot as plt
 # ============================================================
 # CONFIG
 # ============================================================
-equation_type = "poisson"   # "poisson", "helmholtz", or "varpoisson"
-model_kind = "all"             # "spectral_filter_baseline", "diag_phase_free",
-                               # "unitary", "richer_spectral",
-                               # "hhl_like_structured", "hhl_like_free", or "all"
+equation_type = "poisson"  # "poisson", "helmholtz", or "varpoisson"
+model_kind = "all"  # "spectral_filter_baseline", "diag_phase_free",
+# "unitary", "richer_spectral",
+# "hhl_like_structured", "hhl_like_free", or "all"
 
 N = 16
 max_mode = 6
-noise_std = 0#0.05
+noise_std = 0  # 0.05
 
 helmholtz_omega = 8.0
 
@@ -34,7 +34,7 @@ n_test = 15
 n_epochs = 180
 lr = 0.02
 
-seed_list = [0, 1, 2]#, 3, 4]
+seed_list = [0, 1, 2]  # , 3, 4]
 
 n_expr_samples = 120
 n_expr_bins = 40
@@ -48,6 +48,7 @@ dev_ansatz = qml.device("default.qubit", wires=n_qubits)
 dev_hhl_like = qml.device("default.qubit", wires=n_qubits + 1)
 
 torch.set_default_dtype(torch.float64)
+
 
 # ============================================================
 # PDE HELPERS
@@ -163,6 +164,7 @@ S_torch = torch.tensor(S_np, dtype=torch.complex128)
 
 lambda_np = discrete_laplacian_eigs(N)
 lambda_torch = torch.tensor(lambda_np, dtype=torch.float64)
+
 
 # ============================================================
 # QNODES
@@ -332,7 +334,9 @@ def sample_gradient_statistics(model_forward, theta, dataset):
     for sample in dataset:
         th = theta.clone().detach().requires_grad_(True)
         loss_i = sample_loss_model(model_forward, th, sample)
-        grad_i = torch.autograd.grad(loss_i, th, retain_graph=False, create_graph=False)[0]
+        grad_i = torch.autograd.grad(
+            loss_i, th, retain_graph=False, create_graph=False
+        )[0]
         grads.append(grad_i.reshape(-1).detach())
 
     G = torch.stack(grads, dim=0)
@@ -375,7 +379,9 @@ def sample_random_theta_like(theta_template, rng, scale=1.0):
     return torch.tensor(arr, dtype=torch.float64)
 
 
-def compute_expressibility(model_forward, theta_template, n_samples=120, n_bins=40, seed=12345):
+def compute_expressibility(
+    model_forward, theta_template, n_samples=120, n_bins=40, seed=12345
+):
     rng = np.random.default_rng(seed)
     dim = N
     fidelities = []
@@ -616,8 +622,12 @@ def run_one_seed(seed):
     torch.manual_seed(seed)
     np.random.seed(seed)
 
-    train_data = make_dataset(n_train, equation_type, noise_std, seed, omega=helmholtz_omega)
-    test_data = make_dataset(n_test, equation_type, noise_std, seed + 100, omega=helmholtz_omega)
+    train_data = make_dataset(
+        n_train, equation_type, noise_std, seed, omega=helmholtz_omega
+    )
+    test_data = make_dataset(
+        n_test, equation_type, noise_std, seed + 100, omega=helmholtz_omega
+    )
 
     if model_kind == "all":
         model_specs = [
@@ -724,7 +734,9 @@ def run_one_seed(seed):
         opt_hwe.step()
 
         with torch.no_grad():
-            train_loss.append(dataset_loss_model(hwe_model, theta_hwe, train_data).item())
+            train_loss.append(
+                dataset_loss_model(hwe_model, theta_hwe, train_data).item()
+            )
             test_loss.append(dataset_loss_model(hwe_model, theta_hwe, test_data).item())
             train_fid.append(dataset_fidelity_model(hwe_model, theta_hwe, train_data))
             test_fid.append(dataset_fidelity_model(hwe_model, theta_hwe, test_data))
@@ -807,13 +819,15 @@ for mk in all_model_keys:
         "grad_var_trace",
         "grad_sq_mean",
     ]:
-        aggregated[mk][key + "_mean"], aggregated[mk][key + "_std"] = mean_std_model(mk, key)
+        aggregated[mk][key + "_mean"], aggregated[mk][key + "_std"] = mean_std_model(
+            mk, key
+        )
 
     aggregated[mk]["theta_numel"] = all_results[0][mk]["theta_numel"]
 
 
 # ============================================================
-# PLOTS NO PAPER-READY BUT USEFUL FOR ANALYSIS 
+# PLOTS NO PAPER-READY BUT USEFUL FOR ANALYSIS
 # ============================================================
 title_suffix = equation_type.capitalize()
 if equation_type == "helmholtz":
@@ -832,7 +846,9 @@ label_map = {
 }
 
 for eps in richer_epsilon_list:
-    label_map[f"richer_spectral_eps_{eps:.2f}"] = fr"Diag-richer spectral ($\epsilon={eps:.2f}$)"
+    label_map[f"richer_spectral_eps_{eps:.2f}"] = (
+        rf"Diag-richer spectral ($\epsilon={eps:.2f}$)"
+    )
 
 base_markers = ["o", "x", "^", "d", "p", "h", "s", "*", "v"]
 style_map = {}
@@ -846,8 +862,18 @@ k_plot = np.arange(1, N + 1)
 
 plt.figure(figsize=(9, 5.2))
 for mk in all_model_keys:
-    plt.plot(epochs, aggregated[mk]["train_loss_mean"], style_map[mk]["train"], label=f"{label_map[mk]} train")
-    plt.plot(epochs, aggregated[mk]["test_loss_mean"], style_map[mk]["test"], label=f"{label_map[mk]} test")
+    plt.plot(
+        epochs,
+        aggregated[mk]["train_loss_mean"],
+        style_map[mk]["train"],
+        label=f"{label_map[mk]} train",
+    )
+    plt.plot(
+        epochs,
+        aggregated[mk]["test_loss_mean"],
+        style_map[mk]["test"],
+        label=f"{label_map[mk]} test",
+    )
 plt.xlabel("Epoch")
 plt.ylabel("MSE loss")
 plt.title(f"{title_suffix} - Loss")
@@ -857,8 +883,18 @@ plt.tight_layout()
 
 plt.figure(figsize=(9, 5.2))
 for mk in all_model_keys:
-    plt.plot(epochs, aggregated[mk]["train_fid_mean"], style_map[mk]["train"], label=f"{label_map[mk]} train")
-    plt.plot(epochs, aggregated[mk]["test_fid_mean"], style_map[mk]["test"], label=f"{label_map[mk]} test")
+    plt.plot(
+        epochs,
+        aggregated[mk]["train_fid_mean"],
+        style_map[mk]["train"],
+        label=f"{label_map[mk]} train",
+    )
+    plt.plot(
+        epochs,
+        aggregated[mk]["test_fid_mean"],
+        style_map[mk]["test"],
+        label=f"{label_map[mk]} test",
+    )
 plt.xlabel("Epoch")
 plt.ylabel("Mean fidelity")
 plt.title(f"{title_suffix} - Fidelity")
@@ -868,7 +904,12 @@ plt.tight_layout()
 
 plt.figure(figsize=(9, 5.2))
 for mk in all_model_keys:
-    plt.plot(k_plot, aggregated[mk]["abs_err_mean"], style_map[mk]["train"], label=label_map[mk])
+    plt.plot(
+        k_plot,
+        aggregated[mk]["abs_err_mean"],
+        style_map[mk]["train"],
+        label=label_map[mk],
+    )
 plt.xlabel("Mode index k")
 plt.ylabel("Absolute spectral error")
 plt.title(f"{title_suffix} - Absolute spectral error")
@@ -878,7 +919,12 @@ plt.tight_layout()
 
 plt.figure(figsize=(9, 5.2))
 for mk in all_model_keys:
-    plt.plot(k_plot, aggregated[mk]["rel_err_mean"], style_map[mk]["train"], label=label_map[mk])
+    plt.plot(
+        k_plot,
+        aggregated[mk]["rel_err_mean"],
+        style_map[mk]["train"],
+        label=label_map[mk],
+    )
 plt.xlabel("Mode index k")
 plt.ylabel("Relative spectral error")
 plt.title(f"{title_suffix} - Relative spectral error")
@@ -888,7 +934,12 @@ plt.tight_layout()
 
 plt.figure(figsize=(9, 5.2))
 for mk in all_model_keys:
-    plt.plot(k_plot, aggregated[mk]["grad_power_mean"], style_map[mk]["train"], label=label_map[mk])
+    plt.plot(
+        k_plot,
+        aggregated[mk]["grad_power_mean"],
+        style_map[mk]["train"],
+        label=label_map[mk],
+    )
 plt.xlabel("Mode index k")
 plt.ylabel(r"$\frac{1}{P}\sum_p \mathbb{E}[|\partial_{\theta_p} c_k|^2]$")
 plt.title(f"{title_suffix} - Gradient power per mode")
@@ -938,15 +989,29 @@ for mk in all_model_keys:
     print("-" * 110)
     print(f"{label_map[mk]}")
     print(f"#params                 : {aggregated[mk]['theta_numel']}")
-    print(f"Test loss               : {aggregated[mk]['test_loss_mean'][-1]:.6f} ± {aggregated[mk]['test_loss_std'][-1]:.6f}")
-    print(f"Test fidelity           : {aggregated[mk]['test_fid_mean'][-1]:.6f} ± {aggregated[mk]['test_fid_std'][-1]:.6f}")
-    print(f"KL to Haar              : {aggregated[mk]['expressibility_mean']:.6f} ± {aggregated[mk]['expressibility_std']:.6f}")
-    print(f"Grad variance mean      : {aggregated[mk]['grad_var_mean_mean']:.6e} ± {aggregated[mk]['grad_var_mean_std']:.6e}")
-    print(f"Grad variance trace     : {aggregated[mk]['grad_var_trace_mean']:.6e} ± {aggregated[mk]['grad_var_trace_std']:.6e}")
-    print(f"Mean squared gradient   : {aggregated[mk]['grad_sq_mean_mean']:.6e} ± {aggregated[mk]['grad_sq_mean_std']:.6e}")
+    print(
+        f"Test loss               : {aggregated[mk]['test_loss_mean'][-1]:.6f} ± {aggregated[mk]['test_loss_std'][-1]:.6f}"
+    )
+    print(
+        f"Test fidelity           : {aggregated[mk]['test_fid_mean'][-1]:.6f} ± {aggregated[mk]['test_fid_std'][-1]:.6f}"
+    )
+    print(
+        f"KL to Haar              : {aggregated[mk]['expressibility_mean']:.6f} ± {aggregated[mk]['expressibility_std']:.6f}"
+    )
+    print(
+        f"Grad variance mean      : {aggregated[mk]['grad_var_mean_mean']:.6e} ± {aggregated[mk]['grad_var_mean_std']:.6e}"
+    )
+    print(
+        f"Grad variance trace     : {aggregated[mk]['grad_var_trace_mean']:.6e} ± {aggregated[mk]['grad_var_trace_std']:.6e}"
+    )
+    print(
+        f"Mean squared gradient   : {aggregated[mk]['grad_sq_mean_mean']:.6e} ± {aggregated[mk]['grad_sq_mean_std']:.6e}"
+    )
 
 print("Spectral filter is included only as a classical baseline.")
-print("Diag-richer spectral: epsilon=0 is diagonal; epsilon=1 uses strongest fixed unitary mixer.")
+print(
+    "Diag-richer spectral: epsilon=0 is diagonal; epsilon=1 uses strongest fixed unitary mixer."
+)
 
 # %%
 # ============================================================
@@ -972,12 +1037,10 @@ payload = {
     "all_results": all_results,
     "aggregated": aggregated,
     "all_model_keys": all_model_keys,
-
     # variables expected by plotting scripts
     "N": N,
     "n_epochs": n_epochs,
     "richer_epsilon_list": richer_epsilon_list,
-
     # useful metadata
     "equation_type": equation_type,
     "model_kind": model_kind,
@@ -1000,5 +1063,3 @@ with open(results_path, "wb") as f:
     pickle.dump(payload, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 print(f"\nSaved results to:\n{results_path}")
-
-

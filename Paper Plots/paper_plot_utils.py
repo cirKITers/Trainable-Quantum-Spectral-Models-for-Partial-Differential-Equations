@@ -200,7 +200,9 @@ def _extract_metric_stack(
     return np.stack([result[model_key][metric_key] for result in all_results], axis=0)
 
 
-def _log_space_median_q25_q75(values: np.ndarray, *, axis: int | None = 0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _log_space_median_q25_q75(
+    values: np.ndarray, *, axis: int | None = 0
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     log_values = np.log10(values + EPS_LOG)
     med = np.median(log_values, axis=axis)
     q25 = np.percentile(log_values, 25, axis=axis)
@@ -256,10 +258,13 @@ def plot_absolute_spectral_error(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=10)
-    styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="absolute_error")
+    styles = build_style_maps(
+        results.all_model_keys,
+        results.richer_epsilon_list,
+        label_variant="absolute_error",
+    )
 
     k_plot = np.arange(1, results.N + 1)
     fig, ax = plt.subplots(figsize=(10.5, 4.8))
@@ -302,7 +307,6 @@ def plot_absolute_spectral_error(
         "fig_absolute_spectral_error_paper",
     )
 
-    
     return fig, ax
 
 
@@ -310,18 +314,20 @@ def plot_training_loss(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    
-    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=10)
-    styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="long")
+    styles = build_style_maps(
+        results.all_model_keys, results.richer_epsilon_list, label_variant="long"
+    )
 
     epochs = np.arange(results.n_epochs)
     fig, ax = plt.subplots(figsize=(10.5, 4.8))
     all_log_values: list[np.ndarray] = []
 
     for model_key in styles.plot_model_keys:
-        metric_values = _extract_metric_stack(results.all_results, model_key, "train_loss")
+        metric_values = _extract_metric_stack(
+            results.all_results, model_key, "train_loss"
+        )
         med, q25, q75 = _log_space_median_q25_q75(metric_values, axis=0)
 
         all_log_values.extend([q25, q75])
@@ -352,7 +358,6 @@ def plot_training_loss(
     fig.tight_layout(rect=[0, 0.13, 1, 1])
     _save_figure(fig, fig_dir, "fig_training_loss_paper_3")
 
-    
     return fig, ax
 
 
@@ -360,18 +365,20 @@ def plot_gradient_power(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    
-    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=9)
-    styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="long")
+    styles = build_style_maps(
+        results.all_model_keys, results.richer_epsilon_list, label_variant="long"
+    )
 
     k_plot = np.arange(1, results.N + 1)
     fig, ax = plt.subplots(figsize=(10.5, 4.8))
     all_log_values: list[np.ndarray] = []
 
     for model_key in styles.plot_model_keys:
-        metric_values = _extract_metric_stack(results.all_results, model_key, "grad_power")
+        metric_values = _extract_metric_stack(
+            results.all_results, model_key, "grad_power"
+        )
         med, q25, q75 = _log_space_median_q25_q75(metric_values, axis=0)
 
         all_log_values.extend([q25, q75])
@@ -409,7 +416,6 @@ def plot_gradient_power(
     fig.tight_layout()
     _save_figure(fig, fig_dir, "fig_gradient_power_paper")
 
-    
     return fig, ax
 
 
@@ -417,11 +423,11 @@ def plot_gradient_variance(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    
-    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("bar")
-    styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="short")
+    styles = build_style_maps(
+        results.all_model_keys, results.richer_epsilon_list, label_variant="short"
+    )
 
     vals, q25s, q75s, cols = [], [], [], []
     for model_key in styles.plot_model_keys:
@@ -493,7 +499,6 @@ def plot_gradient_variance(
     fig.tight_layout()
     _save_figure(fig, fig_dir, "fig_gradient_variance_final_aligned")
 
-    
     return fig, ax
 
 
@@ -501,11 +506,11 @@ def plot_expressibility(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    
-    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("bar")
-    styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="short")
+    styles = build_style_maps(
+        results.all_model_keys, results.richer_epsilon_list, label_variant="short"
+    )
 
     vals, q25s, q75s, cols = [], [], [], []
     for model_key in styles.plot_model_keys:
@@ -568,7 +573,6 @@ def plot_expressibility(
     fig.tight_layout()
     _save_figure(fig, fig_dir, "fig_expressibility_centered_labels")
 
-    
     return fig, ax
 
 
@@ -576,17 +580,19 @@ def plot_training_fidelity(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    
-    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=10)
-    styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="long")
+    styles = build_style_maps(
+        results.all_model_keys, results.richer_epsilon_list, label_variant="long"
+    )
 
     epochs = np.arange(results.n_epochs)
     fig, ax = plt.subplots(figsize=(10.5, 4.8))
 
     for model_key in styles.plot_model_keys:
-        metric_values = _extract_metric_stack(results.all_results, model_key, "train_fid")
+        metric_values = _extract_metric_stack(
+            results.all_results, model_key, "train_fid"
+        )
         mean = np.mean(metric_values, axis=0)
         std = np.std(metric_values, axis=0)
 
@@ -622,7 +628,6 @@ def plot_training_fidelity(
     fig.tight_layout(rect=[0, 0.13, 1, 1])
     _save_figure(fig, fig_dir, "fig_training_fidelity_paper")
 
-    
     return fig, ax
 
 

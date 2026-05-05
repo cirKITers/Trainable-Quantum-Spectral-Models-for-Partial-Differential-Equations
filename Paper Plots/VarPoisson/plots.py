@@ -27,9 +27,7 @@ FIG_DIR = SCRIPT_DIR / "paper_figures"
 
 
 def main(
-    *,
     fig_dir: str | Path = FIG_DIR,
-    
 ) -> LoadedResults:
     results = load_results(RESULTS_PATH)
 
