@@ -267,7 +267,7 @@ def plot_absolute_spectral_error(
     )
 
     k_plot = np.arange(1, results.N + 1)
-    fig, ax = plt.subplots(figsize=(10.5, 4.8))
+    fig, ax = plt.subplots(figsize=(9, 4.8))
     all_log_values: list[np.ndarray] = []
 
     for model_key in styles.plot_model_keys:
@@ -321,7 +321,7 @@ def plot_training_loss(
     )
 
     epochs = np.arange(results.n_epochs)
-    fig, ax = plt.subplots(figsize=(10.5, 4.8))
+    fig, ax = plt.subplots(figsize=(9, 4.8))
     all_log_values: list[np.ndarray] = []
 
     for model_key in styles.plot_model_keys:
@@ -592,7 +592,7 @@ def plot_gradient_power(
     )
 
     k_plot = np.arange(1, results.N + 1)
-    fig, ax = plt.subplots(figsize=(10.5, 4.8))
+    fig, ax = plt.subplots(figsize=(9, 4.8))
     all_log_values: list[np.ndarray] = []
 
     for model_key in styles.plot_model_keys:
@@ -673,7 +673,7 @@ def plot_gradient_variance(
     heights = vals - base
     x = np.arange(len(styles.plot_model_keys))
 
-    fig, ax = plt.subplots(figsize=(11, 5.0))
+    fig, ax = plt.subplots(figsize=(9, 4.0))
     bars = ax.bar(
         x,
         heights,
@@ -751,7 +751,7 @@ def plot_expressibility(
     x = np.arange(len(styles.plot_model_keys))
     ymax = np.ceil(np.max(q75s) * 10) / 10
 
-    fig, ax = plt.subplots(figsize=(11, 5.0))
+    fig, ax = plt.subplots(figsize=(9, 5.0))
     bars = ax.bar(
         x,
         vals,
@@ -809,7 +809,7 @@ def plot_training_fidelity(
     )
 
     epochs = np.arange(results.n_epochs)
-    fig, ax = plt.subplots(figsize=(10.5, 4.8))
+    fig, ax = plt.subplots(figsize=(9, 4.8))
 
     for model_key in styles.plot_model_keys:
         metric_values = _extract_metric_stack(
