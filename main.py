@@ -72,7 +72,6 @@ def selected_plot_configs(equations: Sequence[str]) -> list[PlotConfig]:
 def plot_results(
     config: PlotConfig,
     *,
-    save_figures: bool = True,
 ) -> LoadedResults:
     print(f"Generating {config.name} figures in {config.figures_dir}")
     results = load_results(config.results_path)
@@ -81,7 +80,7 @@ def plot_results(
         fig, _ = plot_function(
             results,
             fig_dir=config.figures_dir,
-            save_figures=save_figures,
+            
         )
         plt.close(fig)
 
@@ -90,11 +89,9 @@ def plot_results(
 
 def run_plots(
     equations: Sequence[str],
-    *,
-    save_figures: bool = True,
 ) -> list[LoadedResults]:
     return [
-        plot_results(config, save_figures=save_figures)
+        plot_results(config)
         for config in selected_plot_configs(equations)
     ]
 
@@ -117,11 +114,6 @@ def build_parser() -> argparse.ArgumentParser:
         default=["all"],
         help="Equation result sets to plot. Defaults to all.",
     )
-    plots_parser.add_argument(
-        "--no-save",
-        action="store_true",
-        help="Run plotting without writing PDF/PNG files.",
-    )
 
     return parser
 
@@ -133,7 +125,6 @@ def main(argv: Sequence[str] | None = None) -> None:
     if args.command in {"plot"}:
         run_plots(
             args.equations,
-            save_figures=not args.no_save,
         )
 
 

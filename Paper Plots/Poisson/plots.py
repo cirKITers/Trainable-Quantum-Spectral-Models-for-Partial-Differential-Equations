@@ -29,17 +29,16 @@ FIG_DIR = SCRIPT_DIR / "paper_figures"
 def main(
     *,
     fig_dir: str | Path = FIG_DIR,
-    save_figures: bool = True,
     
 ) -> LoadedResults:
     results = load_results(RESULTS_PATH)
 
-    plot_absolute_spectral_error(results, fig_dir=fig_dir, save_figures=save_figures)
-    plot_training_loss(results, fig_dir=fig_dir, save_figures=save_figures)
-    plot_gradient_power(results, fig_dir=fig_dir, save_figures=save_figures)
-    plot_gradient_variance(results, fig_dir=fig_dir, save_figures=save_figures)
-    plot_expressibility(results, fig_dir=fig_dir, save_figures=save_figures)
-    plot_training_fidelity(results, fig_dir=fig_dir, save_figures=save_figures)
+    plot_absolute_spectral_error(results, fig_dir=fig_dir)
+    plot_training_loss(results, fig_dir=fig_dir)
+    plot_gradient_power(results, fig_dir=fig_dir)
+    plot_gradient_variance(results, fig_dir=fig_dir)
+    plot_expressibility(results, fig_dir=fig_dir)
+    plot_training_fidelity(results, fig_dir=fig_dir)
 
     return results
 

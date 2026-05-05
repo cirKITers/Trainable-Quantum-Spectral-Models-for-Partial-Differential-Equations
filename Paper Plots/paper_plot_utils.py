@@ -256,7 +256,7 @@ def plot_absolute_spectral_error(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    save_figures: bool = True,
+    
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=10)
     styles = build_style_maps(results.all_model_keys, results.richer_epsilon_list, label_variant="absolute_error")
@@ -295,13 +295,12 @@ def plot_absolute_spectral_error(
     ax.set_ylabel(r"$E_k$", labelpad=8)
 
     fig.tight_layout(rect=[0, 0.13, 1, 1])
-    if save_figures:
-        _save_figure(
-            fig,
-            fig_dir,
-            "fig_absolute_spectral_error_paper_3",
-            "fig_absolute_spectral_error_paper",
-        )
+    _save_figure(
+        fig,
+        fig_dir,
+        "fig_absolute_spectral_error_paper_3",
+        "fig_absolute_spectral_error_paper",
+    )
 
     
     return fig, ax
@@ -311,7 +310,7 @@ def plot_training_loss(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    save_figures: bool = True,
+    
     
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=10)
@@ -351,8 +350,7 @@ def plot_training_loss(
     ax.set_ylabel(r"$\mathcal{L}_{\mathrm{train}}$", labelpad=8)
 
     fig.tight_layout(rect=[0, 0.13, 1, 1])
-    if save_figures:
-        _save_figure(fig, fig_dir, "fig_training_loss_paper_3")
+    _save_figure(fig, fig_dir, "fig_training_loss_paper_3")
 
     
     return fig, ax
@@ -362,7 +360,7 @@ def plot_gradient_power(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    save_figures: bool = True,
+    
     
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=9)
@@ -409,8 +407,7 @@ def plot_gradient_power(
     )
 
     fig.tight_layout()
-    if save_figures:
-        _save_figure(fig, fig_dir, "fig_gradient_power_paper")
+    _save_figure(fig, fig_dir, "fig_gradient_power_paper")
 
     
     return fig, ax
@@ -420,7 +417,7 @@ def plot_gradient_variance(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    save_figures: bool = True,
+    
     
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("bar")
@@ -494,8 +491,7 @@ def plot_gradient_variance(
     ax.set_ylabel(r"$V_g$")
 
     fig.tight_layout()
-    if save_figures:
-        _save_figure(fig, fig_dir, "fig_gradient_variance_final_aligned")
+    _save_figure(fig, fig_dir, "fig_gradient_variance_final_aligned")
 
     
     return fig, ax
@@ -505,7 +501,7 @@ def plot_expressibility(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    save_figures: bool = True,
+    
     
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("bar")
@@ -570,8 +566,7 @@ def plot_expressibility(
     ax.set_ylabel(r"$D_{\mathrm{KL}}\!\left(p(F)\,\|\,p_{\mathrm{Haar}}(F)\right)$")
 
     fig.tight_layout()
-    if save_figures:
-        _save_figure(fig, fig_dir, "fig_expressibility_centered_labels")
+    _save_figure(fig, fig_dir, "fig_expressibility_centered_labels")
 
     
     return fig, ax
@@ -581,7 +576,7 @@ def plot_training_fidelity(
     results: LoadedResults,
     *,
     fig_dir: str | Path = "paper_figures",
-    save_figures: bool = True,
+    
     
 ) -> tuple[plt.Figure, plt.Axes]:
     apply_paper_style("line", legend_fontsize=10)
@@ -625,8 +620,7 @@ def plot_training_fidelity(
     )
 
     fig.tight_layout(rect=[0, 0.13, 1, 1])
-    if save_figures:
-        _save_figure(fig, fig_dir, "fig_training_fidelity_paper")
+    _save_figure(fig, fig_dir, "fig_training_fidelity_paper")
 
     
     return fig, ax
