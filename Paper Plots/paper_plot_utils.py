@@ -473,6 +473,119 @@ def plot_combined_training_loss(
     return fig, axes
 
 
+def plot_combined_training_modewise(
+    titled_results: Sequence[tuple[str, LoadedResults]],
+    *,
+    fig_dir: str | Path = "paper_figures",
+    pdf_basename: str = "fig_training_loss_combined_paper",
+) -> tuple[plt.Figure, np.ndarray]:
+    if not titled_results:
+        raise ValueError("At least one result set is required.")
+
+    apply_paper_style("line")
+    fig, axes = plt.subplots(
+        1,
+        len(titled_results),
+        figsize=(9, 5),
+        sharex=True,
+        sharey=True,
+        squeeze=False,
+    )
+    axes = axes.ravel()
+    all_log_values: list[np.ndarray] = []
+    legend_entries: dict[str, tuple[Any, str]] = {}
+
+    for panel_index, (ax, (title, results)) in enumerate(zip(axes, titled_results)):
+        styles = build_style_maps(
+            results.all_model_keys,
+            results.richer_epsilon_list,
+            label_variant="long",
+        )
+        epochs = np.arange(results.n_epochs)
+
+        for model_key in styles.plot_model_keys:
+            metric_values = _extract_metric_stack(
+                results.all_results, model_key, "train_loss"
+            )
+            med, q25, q75 = _log_space_median_q25_q75(metric_values, axis=0)
+            all_log_values.extend([q25, q75])
+
+            is_hhl_model = model_key == "hhl_like_free"
+            line, = ax.plot(
+                epochs,
+                med,
+                label=styles.label_map.get(model_key, model_key),
+                color=styles.color_map.get(model_key),
+                linestyle=styles.style_map[model_key]["linestyle"],
+                marker=styles.style_map[model_key]["marker"],
+                linewidth=3.0 if is_hhl_model else 1.35,
+                markersize=4.4 if is_hhl_model else 3.0,
+                markevery=max(1, results.n_epochs // 10),
+                alpha=1.0 if is_hhl_model else 0.62,
+                zorder=5 if is_hhl_model else 2,
+            )
+            ax.fill_between(
+                epochs,
+                q25,
+                q75,
+                color=styles.color_map.get(model_key),
+                alpha=0.20 if is_hhl_model else 0.055,
+                linewidth=0,
+                zorder=4 if is_hhl_model else 1,
+            )
+
+            if model_key.startswith("richer_spectral_eps_"):
+                legend_entries.setdefault(
+                    "richer_spectral",
+                    (line, "Richer spectral variants"),
+                )
+            else:
+                legend_entries.setdefault(
+                    model_key,
+                    (line, styles.label_map.get(model_key, model_key)),
+                )
+
+        ax.set_title(title)
+        ax.set_xlim(0, results.n_epochs - 1)
+        ax.set_xlabel("Epoch")
+        ax.tick_params(labelleft=panel_index == 0)
+
+    global_log_values = np.asarray(all_log_values)
+    for ax in axes:
+        _apply_dynamic_log_ticks(ax, global_log_values)
+
+    axes[0].set_ylabel(r"$\mathcal{L}_{\mathrm{train}}$", labelpad=8)
+    legend_order = [
+        "diag_phase_free",
+        "unitary",
+        "richer_spectral",
+        "hhl_like_free",
+        "hwe",
+    ]
+    legend_handles = [
+        legend_entries[key][0] for key in legend_order if key in legend_entries
+    ]
+    legend_labels = [
+        legend_entries[key][1] for key in legend_order if key in legend_entries
+    ]
+    fig.legend(
+        legend_handles,
+        legend_labels,
+        frameon=False,
+        ncol=3,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.02),
+        columnspacing=1.4,
+        handlelength=2.0,
+        handletextpad=0.6,
+    )
+    fig.tight_layout(rect=[0, 0.16, 1, 1])
+    _save_figure(fig, fig_dir, pdf_basename)
+
+    return fig, axes
+
+
+
 def plot_combined_training_fidelity(
     titled_results: Sequence[tuple[str, LoadedResults]],
     *,

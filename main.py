@@ -139,6 +139,23 @@ def run_combined_training_loss_plot(equations: Sequence[str]) -> LoadedResults |
     return titled_results[-1][1]
 
 
+def run_combined_training_modewise_plot(equations: Sequence[str]) -> LoadedResults | None:
+    configs = selected_combined_training_loss_configs(equations)
+    if not configs:
+        return None
+
+    titled_results = [
+        (title, load_results(config.results_path))
+        for title, config in configs
+    ]
+    fig, _ = plot_combined_training_loss(
+        titled_results,
+        fig_dir=COMBINED_FIGURES_DIR,
+    )
+    plt.close(fig)
+    return titled_results[-1][1]
+
+
 def run_combined_training_fidelity_plot(
     equations: Sequence[str],
 ) -> LoadedResults | None:
@@ -192,6 +209,14 @@ def build_parser() -> argparse.ArgumentParser:
             "for the selected equations."
         ),
     )
+    plots_parser.add_argument(
+        "--combined-training-modewise",
+        action="store_true",
+        help=(
+            "Also generate one shared multi-panel training-modewise figure "
+            "for the selected equations."
+        ),
+    )
 
     return parser
 
@@ -206,6 +231,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         )
         if args.combined_training_loss:
             run_combined_training_loss_plot(args.equations)
+        if args.combined_training_modewise:
+            run_combined_training_modewise_plot(args.equations)
         if args.combined_training_fidelity:
             run_combined_training_fidelity_plot(args.equations)
 
